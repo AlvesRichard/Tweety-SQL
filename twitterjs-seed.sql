@@ -24,7 +24,31 @@ INSERT INTO tweets (user_id, content) VALUES ((SELECT id from users where name='
 
 
 ------------------------------------------------------------------------------------
-
-SELECT u.name, t.content ,u.picture_url FROM tweets as t
+-- /
+SELECT u.name, t.content, t.id ,u.picture_url FROM tweets as t
 INNER JOIN users as u
 ON u.id=t.user_id;
+
+-- /users/:username
+SELECT u.name, t.content, t.id ,u.picture_url FROM tweets as t
+INNER JOIN users as u
+ON u.id=t.user_id
+WHERE u.name = $1;
+
+-- /tweets/:id
+SELECT t.content, t.id, u.name, u.picture_url FROM tweets as t
+INNER JOIN users as u
+ON u.id=t.user_id
+WHERE t.id = $1;
+
+-- post /tweets
+SELECT u.name FROM users
+WHERE u.name = $1
+
+SELECT id FROM users
+WHERE name = $1;
+
+INSERT INTO tweets (user_id, content)
+VALUES ($1, $2)
+WHERE u.id = $1
+
