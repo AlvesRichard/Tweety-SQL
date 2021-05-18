@@ -21,3 +21,10 @@ INSERT INTO tweets (user_id, content) VALUES ((SELECT id from users where name='
 INSERT INTO tweets (user_id, content) VALUES ((SELECT id from users where name='Taylor Swift'),        'I''ve got some whitespace baby — and I''ll write your `.name`');
 INSERT INTO tweets (user_id, content) VALUES ((SELECT id from users where name='Kanye West'),          'I think what Kanye West is going to mean is something similar to what Steve Jobs means.');
 INSERT INTO tweets (user_id, content) VALUES ((SELECT id from users where name='Kanye West'),          'I''ma let you finish coding, but…');
+
+
+------------------------------------------------------------------------------------
+
+SELECT u.name, t.content ,u.picture_url FROM tweets as t
+INNER JOIN users as u
+ON u.id=t.user_id;

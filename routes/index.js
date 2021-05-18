@@ -2,16 +2,16 @@
 var express = require('express');
 var router = express.Router();
 var tweetBank = require('../tweetBank');
+const client = require('../db/index');
 
 module.exports = router;
 
 // una función reusable
 function respondWithAllTweets (req, res, next){
-  var allTheTweets = tweetBank.list();
-  res.render('index', {
-    title: 'Twitter.js',
-    tweets: allTheTweets,
-    showForm: true
+  client.query('SELECT u.name, t.content , u.picture_url FROM tweets as t INNER JOIN users as u ON u.id=t.user_id;', function (err, result) {
+    if (err) return next(err); // pasa el error a Express
+    var tweets = result.rows;
+    res.render('index', { title: 'Tweety.js', tweets: tweets, showForm: true });
   });
 }
 
