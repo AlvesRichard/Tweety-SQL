@@ -60,55 +60,29 @@ router.get("/tweets/:id", function (req, res, next) {
   );
 });
 
-function validar(name) {
-  // ver si el usuario existe
-  client.query(
-    "SELECT name FROM users WHERE name = $1;",
-    [name],
-    function (err, result) {
-      console.log("dentro de validar: ", result.rows);
-      return false;
-      // if (result.rows.length) return true;
-    }
-  );
-}
-
 // crear un nuevo tweet
 router.post("/tweets", function (req, res, next) {
-  // var newTweet = tweetBank.add(req.body.name, req.body.content);
-  // res.redirect("/");
-
-  let id;
-  console.log(typeof req.body.name);
+  // CONSIGO LA ID DEL USUARIO
   client.query(
     "SELECT id FROM users WHERE name = $1;",
     [req.body.name],
     function (err, result) {
-      id = result.rows[0].id;
+      if (!result.rows[0]) {
+        // SINO EXISTE, CREO EL USUARIO
+        client.query("INSERT INTO users (name) VALUES ($1);",[req.body.name],(err,result)=>{
+          if(err) console.log(err);
+        })
+      }
+      // si el usuario ya existe, crear el tweet
+      client.query(
+         "INSERT INTO tweets (user_id, content) VALUES ((SELECT id FROM users WHERE name=$1), $2);",
+        [req.body.name, req.body.content],
+        function (err, result) {
+          if (err) return next(err); // pasa el error 
+        }); 
     }
   );
-
-  let bool = validar(req.body.name);
-  console.log(bool);
-
-  if (bool) {
-    // si el usuario ya existe, crear el tweet
-    client.query(
-      "INSERT INTO tweets (user_id, content) VALUES ($1, $2);",
-      [id, req.body.content],
-      function (err, result) {
-        if (err) return next(err); // pasa el error a Express
-        var tweets = result.rows;
-        res.render("index", {
-          title: "Tweety.js",
-          tweets: tweets,
-          showForm: true,
-        });
-      }
-    );
-
-    res.redirect("/");
-  }
+  res.redirect("/");
 });
 
 // // reemplazá esta ruta hard-codeada con static routing general en app.js
